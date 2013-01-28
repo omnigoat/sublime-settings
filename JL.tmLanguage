@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>fileTypes</key>
+	<array>
+		<string>jl</string>
+	</array>
+	<key>firstLineMatch</key>
+	<string>-[*]-( Mode:)? JL -[*]-</string>
+	<key>foldingStartMarker</key>
+	<string>(?x)
+		 /\*\*(?!\*)
+		|^(?![^{]*?//|[^{]*?/\*(?!.*?\*/.*?\{)).*?\{\s*($|//|/\*(?!.*?\*/.*\S))
+	</string>
+	<key>foldingStopMarker</key>
+	<string>(?&lt;!\*)\*\*/|^\s*\}</string>
+	<key>keyEquivalent</key>
+	<string>^~JL</string>
+	<key>name</key>
+	<string>JL</string>
+	<key>scopeName</key>
+	<string>source.c</string>
+	<key>patterns</key>
+	<array>
+	
+		<!--
+			C++ Typename:
+			(?:const\s+|volatile\s+){0,2}(::)?(?'ty'[a-zA-Z_][a-zA-Z0-9_]*)(::\g'ty')*((?:\s+(?:const\s+|volatile\s+){0,2})\s*\*)*&?
+		-->
+		
+
+		<dict>
+			<key>name</key>
+			<string>comment.c</string>
+			<key>match</key>
+			<string>^\s*//.*$</string>
+		</dict>
+
+		<dict>
+			<key>match</key>
+			<string>\b([A-Z_]+)\b</string>
+			<key>name</key>
+			<string>macro</string>
+		</dict>
+
+		<dict>
+			<key>match</key>
+			<string>\b(break|case|continue|default|do|else|for|goto|if|return|switch|while)\b</string>
+			<key>name</key>
+			<string>keyword.control.c</string>
+		</dict>
+
+		
+
+		
+
+		<dict>
+			<key>match</key>
+			<string>\b(true|false|nullptr)\b</string>
+			<key>name</key>
+			<string>constant.language.c</string>
+		</dict>
+		
+
+		<!-- function delcaration -->
+		<dict>
+			<key>name</key>
+			<string>function.c</string>
+			<key>begin</key>
+			<string>(?=([a-zA-Z0-9_:*&]|\s+(const|volatile)\b)+\s+[a-z_]+\s*\()</string>
+			<key>end</key>
+			<string>(?=\))</string>
+			<key>patterns</key>
+			<array>
+				<!-- between parenthesis -->
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=[(])</string>
+					<key>end</key>
+					<string>(?=[)\$])</string>
+					<key>patterns</key>
+					<array>
+						<!-- one parameter (between parenthesis and commas) -->
+						<dict>
+							<key>begin</key>
+							<string>(?&lt;=[,(])</string>
+							<key>end</key>
+							<string>\s*(?=[,)\$])</string>
+							<key>patterns</key>
+							<array>
+								<!-- (typename) (param-name) -->
+								<dict>
+									<key>begin</key>
+									<string>(?=[a-z_:]+\s+[a-z_])</string>
+									<key>end</key>
+									<string>(?=[,)\$])</string>
+									<key>patterns</key>
+									<array>
+										<!-- parameter name -->
+										<dict>
+											<key>name</key>
+											<string>parameter</string>
+											<key>match</key>
+											<string>(?&lt;=\s)([a-z_]+)(?=\s*[,)\$])</string>
+										</dict>
+
+										<dict><key>include</key><string>#punctuation</string></dict>
+										<dict><key>include</key><string>#storage-modifier</string></dict>
+										<dict><key>include</key><string>#storage-type</string></dict>
+									</array>
+								</dict>
+
+								<!-- punctuation for when there's no parameter name -->
+								<dict><key>include</key><string>#punctuation</string></dict>
+							</array>
+						</dict>
+						<!-- commas -->
+						<dict><key>include</key><string>#punctuation</string></dict>
+					</array>
+				</dict>
+
+				<!-- function name -->
+				<dict>
+					<key>name</key>
+					<string>entity.name</string>
+					<key>match</key>
+					<string>(?&lt;=\s)[a-z_]+(?=\s*\()</string>
+				</dict>
+
+				<dict><key>include</key><string>#punctuation</string></dict>
+				<dict><key>include</key><string>#storage-modifier</string></dict>
+				<dict><key>include</key><string>#storage-type</string></dict>
+			</array>
+		</dict>
+		
+		
+		<dict><key>include</key><string>#punctuation</string></dict>
+		<dict><key>include</key><string>#storage-modifier</string></dict>
+		<dict><key>include</key><string>#storage-type</string></dict>
+	</array>
+
+	<key>repository</key>
+	<dict>
+		<key>storage-type</key>
+		<dict>
+			<key>name</key>
+			<string>storage.type.c</string>
+			<key>match</key>
+			<string>\b(asm|__asm__|auto|bool|char|double|enum|float|int|long|short|signed|struct|typedef|union|unsigned|void)\b</string>
+		</dict>
+		
+		<key>storage-modifier</key>
+		<dict>
+			<key>match</key>
+			<string>\b(const|extern|register|restrict|static|volatile|inline|mutable)\b</string>
+			<key>name</key>
+			<string>storage.modifier.c</string>
+		</dict>
+
+		<key>punctuation</key>
+		<dict>
+			<key>name</key>
+			<string>punctuation.c</string>
+			<key>match</key>
+			<string>::|[()&,{};.]|-&gt;</string>
+		</dict>
+
+	</dict>
+
+	<key>uuid</key>
+	<string>25066DC2-6B1D-11D9-9D5B-000D93589AF6</string>
+</dict>
+</plist>
+ 
