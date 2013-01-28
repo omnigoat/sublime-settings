@@ -39,7 +39,7 @@
 
 		<dict>
 			<key>match</key>
-			<string>\b([A-Z_]+)\b</string>
+			<string>\b([A-Z_][A-Z0-9_]+)\s*\(.*?\)</string>
 			<key>name</key>
 			<string>macro</string>
 		</dict>
@@ -68,7 +68,7 @@
 			<key>name</key>
 			<string>function.c</string>
 			<key>begin</key>
-			<string>(?=([a-zA-Z0-9_:*&]|\s+(const|volatile)\b)+\s+[a-z_]+\s*\()</string>
+			<string>(?=([a-zA-Z0-9_:*&]|\s+(const|volatile)\b)+\s+[a-z_:]+\s*\()</string>
 			<key>end</key>
 			<string>(?=\))</string>
 			<key>patterns</key>
@@ -92,7 +92,7 @@
 								<!-- (typename) (param-name) -->
 								<dict>
 									<key>begin</key>
-									<string>(?=[a-z_:]+\s+[a-z_])</string>
+									<string>(?=[a-z_:&amp;*]+\s+[a-z_])</string>
 									<key>end</key>
 									<string>(?=[,)\$])</string>
 									<key>patterns</key>
@@ -125,7 +125,7 @@
 					<key>name</key>
 					<string>entity.name</string>
 					<key>match</key>
-					<string>(?&lt;=\s)[a-z_]+(?=\s*\()</string>
+					<string>(?&lt;=\s)[a-z_:]+(?=\s*\()</string>
 				</dict>
 
 				<dict><key>include</key><string>#punctuation</string></dict>
@@ -134,7 +134,7 @@
 			</array>
 		</dict>
 		
-		
+		<dict><key>include</key><string>#block-comment</string></dict>
 		<dict><key>include</key><string>#punctuation</string></dict>
 		<dict><key>include</key><string>#storage-modifier</string></dict>
 		<dict><key>include</key><string>#storage-type</string></dict>
@@ -153,7 +153,7 @@
 		<key>storage-modifier</key>
 		<dict>
 			<key>match</key>
-			<string>\b(const|extern|register|restrict|static|volatile|inline|mutable)\b</string>
+			<string>\b(const|extern|register|restrict|static|volatile|inline|mutable|using)\b</string>
 			<key>name</key>
 			<string>storage.modifier.c</string>
 		</dict>
@@ -164,6 +164,24 @@
 			<string>punctuation.c</string>
 			<key>match</key>
 			<string>::|[()&,{};.]|-&gt;</string>
+		</dict>
+
+		<key>block-comment</key>
+		<dict>
+			<key>begin</key>
+			<string>/\*</string>
+			<key>captures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.comment.c</string>
+				</dict>
+			</dict>
+			<key>end</key>
+			<string>\*/</string>
+			<key>name</key>
+			<string>comment.block.c</string>
 		</dict>
 
 	</dict>
