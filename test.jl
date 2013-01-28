@@ -7,7 +7,9 @@ using shiny::voodoo::cpu_access_t;
 
 auto shiny::voodoo::create_buffer(ID3D11Buffer** buffer, gpu_access_t gpu_access, cpu_access_t cpu_access, unsigned long data_size) -> void
 {
-	// calcualte the buffer usage based off our gpu-access/cpu-access flags
+	ATMA_ASSERT(buffer != nullptr);
+
+	// calculate the buffer usage based off our gpu-access/cpu-access flags
 	D3D11_USAGE buffer_usage = D3D11_USAGE_DEFAULT;
 	if (cpu_access == cpu_access_t::write) {
 		if (gpu_access == gpu_access_t::read) {
