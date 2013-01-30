@@ -29,6 +29,73 @@
 			(?:const\s+|volatile\s+){0,2}(::)?(?'ty'[a-zA-Z_][a-zA-Z0-9_]*)(::\g'ty')*((?:\s+(?:const\s+|volatile\s+){0,2})\s*\*)*&?
 		-->
 		
+		<dict>
+			<key>begin</key>
+			<string>"</string>
+			<key>beginCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.string.begin.c</string>
+				</dict>
+			</dict>
+			<key>end</key>
+			<string>"</string>
+			<key>endCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.string.end.c</string>
+				</dict>
+			</dict>
+			<key>name</key>
+			<string>string.quoted.double.c</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>#string_escaped_char</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#string_placeholder</string>
+				</dict>
+			</array>
+		</dict>
+		<dict>
+			<key>begin</key>
+			<string>'</string>
+			<key>beginCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.string.begin.c</string>
+				</dict>
+			</dict>
+			<key>end</key>
+			<string>'</string>
+			<key>endCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.string.end.c</string>
+				</dict>
+			</dict>
+			<key>name</key>
+			<string>string.quoted.single.c</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>#string_escaped_char</string>
+				</dict>
+			</array>
+		</dict>
+
 
 		<dict>
 			<key>name</key>
@@ -38,16 +105,39 @@
 		</dict>
 
 		<dict>
-			<key>match</key>
-			<string>\b([A-Z_][A-Z0-9_]+)\s*\(.*?\)</string>
 			<key>name</key>
-			<string>macro</string>
+			<string>meta.preprocessor.macro</string>
+			<key>begin</key>
+			<string>(?=\b([A-Z_][A-Z0-9_]+)\s*\()</string>
+			<key>end</key>
+			<string>(?&lt;=\))</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>name</key>
+					<string>entity.name</string>
+					<key>match</key>
+					<string>[A-Z]+</string>
+				</dict>
+
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition</string>
+					<key>match</key>
+					<string>[()]</string>
+				</dict>
+
+				<dict><key>include</key><string>#punctuation</string></dict>
+				<dict><key>include</key><string>#storage-modifier</string></dict>
+				<dict><key>include</key><string>#storage-type</string></dict>
+			</array>
 		</dict>
+
 		<dict>
 			<key>match</key>
 			<string>\b([A-Z_][A-Z0-9_]+)\b</string>
 			<key>name</key>
-			<string>field</string>
+			<string>meta.field</string>
 		</dict>
 
 		<dict>
@@ -67,14 +157,131 @@
 			<key>name</key>
 			<string>constant.language.c</string>
 		</dict>
+
+
+		<!-- #define -->
+		<dict>
+			<key>name</key>
+			<string>meta.preprocessor.macro.c</string>
+			<key>begin</key>
+			<string>(?x)
+				# define
+				^\s*(\#)\s*(define)\s*
+				# name
+				([a-zA-Z_][a-zA-Z0-9_]*)\s*
+				# opening parenthesis
+				(\()
+			</string>
+			<key>captures</key>
+			<dict>
+				<key>1</key><dict><key>name</key><string>punctuation.definition.tag</string></dict>
+				<key>2</key><dict><key>name</key><string>keyword.control</string></dict>
+				<key>3</key><dict><key>name</key><string>entity.name</string></dict>
+				<key>4</key><dict><key>name</key><string>punctuation.definition.open-paren</string></dict>
+			</dict>
+			<key>end</key>
+			<string>\)</string>
+			<key>endCaptures</key>
+			<dict>
+				<key>0</key><dict><key>name</key><string>punctuation.definition.close-paren</string></dict>
+			</dict>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>match</key>
+					<string>,</string>
+					<key>captures</key>
+					<dict>
+						<key>0</key><dict><key>name</key><string>punctuation.definition.comma</string></dict>
+					</dict>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>[a-zA-Z_][a-zA-Z0-9_]*</string>
+					<key>captures</key>
+					<dict>
+						<key>0</key><dict><key>name</key><string>entity.parameter</string></dict>
+					</dict>
+				</dict>
+			</array>
+		</dict>
 		
+
+
+
+
+		<!-- #include -->
+		<dict>
+			<key>name</key>
+			<string>meta.preprocessor.include.c</string>
+			<key>begin</key>
+			<string>^\s*(\#)\s*(include)\b\s+</string>
+			<key>captures</key>
+			<dict>
+				<key>1</key><dict><key>name</key><string>punctuation.definition.tag</string></dict>
+				<key>2</key><dict><key>name</key><string>keyword.control.include.c</string></dict>
+			</dict>
+			<key>end</key>
+			<string>(?=(?://|/\*))|$</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>name</key>
+					<string>punctuation.separator.continuation.c</string>
+					<key>match</key>
+					<string>(?&gt;\\\s*\n)</string>
+				</dict>
+				<dict>
+					<key>name</key>
+					<string>string.quoted.double.include.c</string>
+					<key>begin</key>
+					<string>"</string>
+					<key>beginCaptures</key>
+					<dict>
+						<key>0</key><dict><key>name</key><string>punctuation.definition.string.begin.c</string></dict>
+					</dict>
+					<key>end</key>
+					<string>"</string>
+					<key>endCaptures</key>
+					<dict>
+						<key>0</key><dict><key>name</key><string>punctuation.definition.string.end.c</string></dict>
+					</dict>
+				</dict>
+				<dict>
+					<key>name</key>
+					<string>string.quoted.triangle.include.c</string>
+					<key>begin</key>
+					<string>&lt;</string>
+					<key>beginCaptures</key>
+					<dict>
+						<key>0</key><dict><key>name</key><string>punctuation.definition.string.begin.c</string></dict>
+					</dict>
+					<key>end</key>
+					<string>&gt;</string>
+					<key>endCaptures</key>
+					<dict>
+						<key>0</key><dict><key>name</key><string>punctuation.definition.string.end.c</string></dict>
+					</dict>
+				</dict>
+			</array>
+		</dict>
+
+
+
+
 
 		<!-- function delcaration -->
 		<dict>
 			<key>name</key>
-			<string>function.c</string>
+			<string>meta.function.c</string>
 			<key>begin</key>
-			<string>(?=([a-zA-Z0-9_:*&]|\s+(const|volatile)\b)+\s+[a-z_:]+\s*\()</string>
+			<string>(?x)
+				# regular function
+				(?=(::)?[a-zA-Z_]([a-zA-Z0-9_:*&amp;]|\s+(const|volatile)\b)+\s+[a-zA-Z0-9_:]+\s*\()
+				|
+				# constructor/destructor
+				(?=(::)?(?'id'[a-zA-Z0-9_]+)(::(?'id'[a-zA-Z0-9_]+))*::~?\k'id'\s*\()
+			</string>
 			<key>end</key>
 			<string>(?=\))</string>
 			<key>patterns</key>
@@ -98,7 +305,7 @@
 								<!-- (typename) (param-name) -->
 								<dict>
 									<key>begin</key>
-									<string>(?=[a-z_:&amp;*]+\s+[a-z_])</string>
+									<string>(?=[a-zA-Z0-9_:*&amp;]+\s+[a-z_])</string>
 									<key>end</key>
 									<string>(?=[,)\$])</string>
 									<key>patterns</key>
@@ -106,9 +313,9 @@
 										<!-- parameter name -->
 										<dict>
 											<key>name</key>
-											<string>parameter</string>
+											<string>entity.parameter</string>
 											<key>match</key>
-											<string>(?&lt;=\s)([a-z_]+)(?=\s*[,)\$])</string>
+											<string>(?&lt;=\s)([a-zA-Z0-9_]+)(?=\s*[,)\$])</string>
 										</dict>
 
 										<dict><key>include</key><string>#punctuation</string></dict>
@@ -131,7 +338,7 @@
 					<key>name</key>
 					<string>entity.name</string>
 					<key>match</key>
-					<string>(?&lt;=\s)[a-z_:]+(?=\s*\()</string>
+					<string>(?&lt;=\s)[a-zA-Z0-9_:]+(?=\s*\()</string>
 				</dict>
 
 				<dict><key>include</key><string>#punctuation</string></dict>
