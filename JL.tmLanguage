@@ -101,43 +101,7 @@
 			<key>name</key>
 			<string>comment.c</string>
 			<key>match</key>
-			<string>^\s*//.*$</string>
-		</dict>
-
-		<dict>
-			<key>name</key>
-			<string>meta.preprocessor.macro</string>
-			<key>begin</key>
-			<string>(?=\b([A-Z_][A-Z0-9_]+)\s*\()</string>
-			<key>end</key>
-			<string>(?&lt;=\))</string>
-			<key>patterns</key>
-			<array>
-				<dict>
-					<key>name</key>
-					<string>entity.name</string>
-					<key>match</key>
-					<string>[A-Z]+</string>
-				</dict>
-
-				<dict>
-					<key>name</key>
-					<string>punctuation.definition</string>
-					<key>match</key>
-					<string>[()]</string>
-				</dict>
-
-				<dict><key>include</key><string>#punctuation</string></dict>
-				<dict><key>include</key><string>#storage-modifier</string></dict>
-				<dict><key>include</key><string>#storage-type</string></dict>
-			</array>
-		</dict>
-
-		<dict>
-			<key>match</key>
-			<string>\b([A-Z_][A-Z0-9_]+)\b</string>
-			<key>name</key>
-			<string>meta.field</string>
+			<string>//.*$</string>
 		</dict>
 
 		<dict>
@@ -146,11 +110,6 @@
 			<key>name</key>
 			<string>keyword.control.c</string>
 		</dict>
-
-		
-
-		
-
 		<dict>
 			<key>match</key>
 			<string>\b(true|false|nullptr)\b</string>
@@ -159,7 +118,29 @@
 		</dict>
 
 
-		<!-- #define -->
+		<!-- #define NO_PARAMETERS -->
+		<dict>
+			<key>name</key>
+			<string>meta.preprocessor.macro.c</string>
+			<key>match</key>
+			<string>(?x)
+				# define
+				^\s*(\#)\s*(define)\s*
+				# name
+				([a-zA-Z_][a-zA-Z0-9_]*)\b
+				# totes not a parameter
+				(?!\s*\()
+			</string>
+			<key>captures</key>
+			<dict>
+				<key>1</key><dict><key>name</key><string>punctuation.definition.tag</string></dict>
+				<key>2</key><dict><key>name</key><string>keyword.control</string></dict>
+				<key>3</key><dict><key>name</key><string>entity.name</string></dict>
+				<key>4</key><dict><key>name</key><string>punctuation.definition.open-paren</string></dict>
+			</dict>
+		</dict>
+
+		<!-- #define HAS_PARAMETERS(things, things) -->
 		<dict>
 			<key>name</key>
 			<string>meta.preprocessor.macro.c</string>
@@ -168,16 +149,16 @@
 				# define
 				^\s*(\#)\s*(define)\s*
 				# name
-				([a-zA-Z_][a-zA-Z0-9_]*)\s*
-				# opening parenthesis
-				(\()
+				([a-zA-Z_][a-zA-Z0-9_]*)\b
+				# totes not a parameter
+				(\s*\()
 			</string>
-			<key>captures</key>
+			<key>beginCaptures</key>
 			<dict>
+				<key>0</key><dict><key>name</key><string>punctuation.definition.close-paren</string></dict>
 				<key>1</key><dict><key>name</key><string>punctuation.definition.tag</string></dict>
 				<key>2</key><dict><key>name</key><string>keyword.control</string></dict>
 				<key>3</key><dict><key>name</key><string>entity.name</string></dict>
-				<key>4</key><dict><key>name</key><string>punctuation.definition.open-paren</string></dict>
 			</dict>
 			<key>end</key>
 			<string>\)</string>
@@ -205,8 +186,6 @@
 				</dict>
 			</array>
 		</dict>
-		
-
 
 
 
