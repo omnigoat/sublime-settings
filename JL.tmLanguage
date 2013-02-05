@@ -106,7 +106,7 @@
 
 		<dict>
 			<key>match</key>
-			<string>\b(break|case|continue|default|do|else|for|goto|if|return|switch|while)\b</string>
+			<string>\b(break|case|continue|default|do|else|for|goto|if|return|switch|while|sizeof)\b</string>
 			<key>name</key>
 			<string>keyword.control.c</string>
 		</dict>
@@ -117,15 +117,36 @@
 			<string>constant.language.c</string>
 		</dict>
 
+		<!-- FIELD -->
+		<dict>
+			<key>name</key>
+			<string>meta.field.c</string>
+			<key>match</key>
+			<string>\b[A-Z0-9_]{2,}\b(?!\s*\(|::)</string>
+		</dict>
 
-		<!-- #define NO_PARAMETERS -->
+
+
+		<!-- FIELD CALLED -->
+		<dict>
+			<key>name</key>
+			<string>meta.preprocessor.macro.call.c</string>
+			<key>match</key>
+			<string>\b([A-Z0-9_]{2,})\s*(?=\()</string>
+			<key>captures</key>
+			<dict>
+				<key>1</key><dict><key>name</key><string>entity.name</string></dict>
+			</dict>
+		</dict>
+
+		<!-- #define/#ifdef/#ifndef NO_PARAMETERS -->
 		<dict>
 			<key>name</key>
 			<string>meta.preprocessor.macro.c</string>
 			<key>match</key>
 			<string>(?x)
 				# define
-				^\s*(\#)\s*(define)\s*
+				^\s*(\#)\s*(define|ifdef|ifndef)\s*
 				# name
 				([a-zA-Z_][a-zA-Z0-9_]*)\b
 				# totes not a parameter
@@ -187,7 +208,17 @@
 			</array>
 		</dict>
 
-
+		<dict>
+			<key>name</key>
+			<string>meta.preprocessor.macro.c</string>
+			<key>match</key>
+			<string>^\s*(\#)\s*(else|endif)\s*</string>
+			<key>captures</key>
+			<dict>
+				<key>1</key><dict><key>name</key><string>punctuation.definition.tag</string></dict>
+				<key>2</key><dict><key>name</key><string>keyword.control</string></dict>
+			</dict>
+		</dict>
 
 		<!-- #include -->
 		<dict>
@@ -256,15 +287,96 @@
 			<key>begin</key>
 			<string>(?x)
 				# regular function
-				(?=(::)?[a-zA-Z_]([a-zA-Z0-9_:*&amp;]|\s+(const|volatile)\b)+\s+[a-zA-Z0-9_:]+\s*\()
-				|
-				# constructor/destructor
-				(?=(::)?(?'id'[a-zA-Z0-9_]+)(::(?'id'[a-zA-Z0-9_]+))*::~?\k'id'\s*\()
+				(?&lt;![A-Z]\s)(?=(::)?[a-zA-Z_]([a-zA-Z0-9_:*&amp;]|\s+(const|volatile)\b)+\s+[a-zA-Z0-9_:]+\s*[(])
+			</string>
+			<key>end</key>
+			<string>\)|$</string>
+			<key>patterns</key>
+			<array>
+				<!-- function name -->
+				<dict>
+					<key>name</key>
+					<string>entity.name</string>
+					<key>match</key>
+					<string>(?&lt;=\s)[a-zA-Z0-9_:]+(?=\s*\()</string>
+				</dict>
+
+				<!-- between parenthesis -->
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=[(])</string>
+					<key>end</key>
+					<string>(?=[)])|$</string>
+					<key>patterns</key>
+					<array>
+						<!-- one parameter (between parenthesis and commas) -->
+						<dict>
+							<key>begin</key>
+							<string>(?&lt;=[,(])</string>
+							<key>end</key>
+							<string>\s*(?=[,)])|$</string>
+							<key>patterns</key>
+							<array>
+								<!-- (typename) (param-name) -->
+								<dict>
+									<key>begin</key>
+									<string>(?=[a-zA-Z0-9_:*&amp;]+\s+[a-z_])</string>
+									<key>end</key>
+									<string>(?=[,)\$])</string>
+									<key>patterns</key>
+									<array>
+										<!-- parameter name -->
+										<dict>
+											<key>name</key>
+											<string>entity.parameter</string>
+											<key>match</key>
+											<string>(?&lt;=\s)([a-zA-Z0-9_]+)(?=\s*[,)\$])</string>
+										</dict>
+
+										<dict><key>include</key><string>#punctuation</string></dict>
+										<dict><key>include</key><string>#storage-modifier</string></dict>
+										<dict><key>include</key><string>#storage-type</string></dict>
+									</array>
+								</dict>
+
+								<!-- punctuation for when there's no parameter name -->
+								<dict><key>include</key><string>#punctuation</string></dict>
+							</array>
+						</dict>
+						<!-- commas -->
+						<dict><key>include</key><string>#punctuation</string></dict>
+					</array>
+				</dict>
+
+				
+
+				<dict><key>include</key><string>#punctuation</string></dict>
+				<dict><key>include</key><string>#storage-modifier</string></dict>
+				<dict><key>include</key><string>#storage-type</string></dict>
+			</array>
+		</dict>
+		
+		<!-- constructor -->
+		<dict>
+			<key>name</key>
+			<string>meta.function.constructor.c</string>
+			<key>begin</key>
+			<string>(?x)
+				# regular function
+				(?=(?'id'[a-zA-Z0-9_]+)::~?\k'id'\s*\()
 			</string>
 			<key>end</key>
 			<string>(?=\))</string>
 			<key>patterns</key>
 			<array>
+				<!-- function name -->
+				<dict>
+					<key>name</key>
+					<string>entity.name</string>
+					<key>match</key>
+					<string>[a-zA-Z0-9_:~]+(?=\s*\()</string>
+				</dict>
+
 				<!-- between parenthesis -->
 				<dict>
 					<key>begin</key>
@@ -312,26 +424,44 @@
 					</array>
 				</dict>
 
-				<!-- function name -->
-				<dict>
-					<key>name</key>
-					<string>entity.name</string>
-					<key>match</key>
-					<string>(?&lt;=\s)[a-zA-Z0-9_:]+(?=\s*\()</string>
-				</dict>
+				
 
 				<dict><key>include</key><string>#punctuation</string></dict>
 				<dict><key>include</key><string>#storage-modifier</string></dict>
 				<dict><key>include</key><string>#storage-type</string></dict>
 			</array>
 		</dict>
+
+
+		<!-- <dict>
+			<key>name</key>
+			<string>meta.variable.definition.c</string>
+			<key>begin</key>
+			<string>(?=[a-zA-Z0-9_:]+\s+[a-zA-Z_][a-zA-Z0-9_]*\s*)</string>
+			<key>end</key>
+			<string>[=();]</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>entity.name</key>
+					<string></string>
+					<key>match</key>
+					<string>[a-zA-Z_][a-zA-Z0-9_]*</string>
+				</dict>
+			</array>
+		</dict>
+ -->
 		
+
+
+
 		<dict><key>include</key><string>#block-comment</string></dict>
 		<dict><key>include</key><string>#punctuation</string></dict>
 		<dict><key>include</key><string>#storage-modifier</string></dict>
 		<dict><key>include</key><string>#storage-type</string></dict>
 	</array>
 
+	
 	<key>repository</key>
 	<dict>
 		<key>storage-type</key>
